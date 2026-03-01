@@ -12,7 +12,7 @@ class RecommendationsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
@@ -36,12 +36,13 @@ class RecommendationsSection extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.1),
+                    color: const Color(0xFF4CAF50)
+                        .withOpacity(0.1), // Primary green
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.lightbulb_outline,
-                    color: theme.colorScheme.primary,
+                    color: Color(0xFF4CAF50), // Primary green
                     size: 24,
                   ),
                 ),
@@ -51,6 +52,7 @@ class RecommendationsSection extends StatelessWidget {
                     'Recommandations Agricoles',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: const Color(0xFF212121), // Dark grey
                     ),
                   ),
                 ),
@@ -79,19 +81,19 @@ class RecommendationsSection extends StatelessWidget {
   ) {
     final theme = Theme.of(context);
     final isUrgent = recommendation.contains('URGENT');
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isUrgent
-            ? theme.colorScheme.error.withOpacity(0.08)
-            : theme.colorScheme.primary.withOpacity(0.05),
+            ? const Color(0xFFD32F2F).withOpacity(0.08) // Alert red
+            : const Color(0xFF4CAF50).withOpacity(0.05), // Primary green
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isUrgent
-              ? theme.colorScheme.error.withOpacity(0.3)
-              : theme.colorScheme.primary.withOpacity(0.2),
+              ? const Color(0xFFD32F2F).withOpacity(0.3)
+              : const Color(0xFF4CAF50).withOpacity(0.2),
           width: 1,
         ),
       ),
@@ -103,8 +105,8 @@ class RecommendationsSection extends StatelessWidget {
             height: 28,
             decoration: BoxDecoration(
               color: isUrgent
-                  ? theme.colorScheme.error
-                  : theme.colorScheme.primary,
+                  ? const Color(0xFFD32F2F) // Alert red
+                  : const Color(0xFF4CAF50), // Primary green
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -126,8 +128,8 @@ class RecommendationsSection extends StatelessWidget {
                 height: 1.5,
                 fontWeight: isUrgent ? FontWeight.w600 : FontWeight.normal,
                 color: isUrgent
-                    ? theme.colorScheme.error
-                    : theme.colorScheme.onSurface,
+                    ? const Color(0xFFD32F2F) // Alert red
+                    : const Color(0xFF212121), // Dark grey
               ),
             ),
           ),
@@ -138,7 +140,7 @@ class RecommendationsSection extends StatelessWidget {
 
   Widget _buildAdditionalTips(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -146,8 +148,8 @@ class RecommendationsSection extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            theme.colorScheme.secondary.withOpacity(0.1),
-            theme.colorScheme.tertiary.withOpacity(0.1),
+            const Color(0xFF2196F3).withOpacity(0.1), // Sky blue
+            const Color(0xFFFFC107).withOpacity(0.1), // Gold yellow
           ],
         ),
         borderRadius: BorderRadius.circular(12),
@@ -157,9 +159,9 @@ class RecommendationsSection extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.info_outline,
-                color: theme.colorScheme.secondary,
+                color: Color(0xFF2196F3), // Sky blue
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -167,7 +169,7 @@ class RecommendationsSection extends StatelessWidget {
                 'Conseils généraux',
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.secondary,
+                  color: const Color(0xFF2196F3), // Sky blue
                 ),
               ),
             ],
@@ -197,14 +199,14 @@ class RecommendationsSection extends StatelessWidget {
 
   Widget _buildTipRow(BuildContext context, IconData icon, String text) {
     final theme = Theme.of(context);
-    
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(
           icon,
           size: 16,
-          color: theme.colorScheme.secondary.withOpacity(0.7),
+          color: const Color(0xFF2196F3).withOpacity(0.7), // Sky blue
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -212,6 +214,7 @@ class RecommendationsSection extends StatelessWidget {
             text,
             style: theme.textTheme.bodySmall?.copyWith(
               height: 1.4,
+              color: const Color(0xFF212121), // Dark grey
             ),
           ),
         ),

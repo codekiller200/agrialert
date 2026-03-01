@@ -4,12 +4,18 @@ import 'package:intl/intl.dart';
 import '../services/weather_service.dart';
 import '../services/drought_prediction_service.dart';
 import '../services/location_service.dart';
+import '../services/theme_service.dart';
+import '../services/localization_service.dart';
+import '../services/notification_service.dart';
+import '../services/market_service.dart';
 import '../models/data_models.dart';
 import '../widgets/drought_risk_card.dart';
 import '../widgets/weather_forecast_card.dart';
 import '../widgets/recommendations_section.dart';
 import '../widgets/region_selector_dialog.dart';
 import '../widgets/burkina_map_widget.dart';
+import 'notifications_screen.dart';
+import 'market_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -60,9 +66,11 @@ class _HomeScreenState extends State<HomeScreen>
 
     final locationService =
         Provider.of<LocationService>(context, listen: false);
+    final marketService = Provider.of<MarketService>(context, listen: false);
 
     // Charger les données en cache d'abord
     await locationService.loadCachedLocation();
+    await marketService.fetchMarketData();
 
     // Tenter de récupérer la position GPS
     await locationService.getCurrentLocation();
@@ -125,15 +133,16 @@ class _HomeScreenState extends State<HomeScreen>
     final theme = Theme.of(context);
 
     return Scaffold(
+      drawer: _buildDrawer(),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              theme.colorScheme.primary,
-              theme.colorScheme.primary.withOpacity(0.8),
-              theme.colorScheme.secondary.withOpacity(0.3),
+              const Color(0xFF4CAF50),
+              const Color(0xFF4CAF50).withOpacity(0.8),
+              const Color(0xFF2196F3).withOpacity(0.2),
             ],
           ),
         ),
@@ -145,12 +154,168 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  Widget _buildDrawer() {
+    final theme = Theme.of(context);
+    final locale =
+        Provider.of<LocalizationService>(context).locale.languageCode;
+
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF4CAF50),
+                  const Color(0xFF4CAF50).withOpacity(0.8),
+                ],
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const Icon(
+                  Icons.water_drop,
+                  color: Colors.white,
+                  size: 48,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'AgriAlert BF',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  _getLocalizedText('app_name', locale),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.home),
+            title: Text(_getLocalizedText('home', locale)),
+            selected: true,
+            onTap: () => Navigator.pop(context),
+          ),
+          ListTile(
+            leading: const Icon(Icons.notifications),
+            title: Text(_getLocalizedText('alerts', locale)),
+            trailing: Consumer<NotificationService>(
+              builder: (context, notifications, child) {
+                final unread = notifications.unreadNotifications.length;
+                return unread > 0
+                    ? Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.error,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '$unread',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink();
+              },
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationsScreen(),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.store),
+            title: Text(_getLocalizedText('market_prices', locale)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MarketScreen(),
+                ),
+              );
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.brightness_6),
+            title: Text(_getLocalizedText('theme', locale)),
+            trailing: Consumer<ThemeService>(
+              builder: (context, themeService, child) {
+                return Switch(
+                  value: themeService.themeMode == ThemeMode.dark,
+                  onChanged: (value) => themeService.toggleTheme(),
+                );
+              },
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.language),
+            title: Text(_getLocalizedText('language', locale)),
+            trailing: Consumer<LocalizationService>(
+              builder: (context, locService, child) {
+                return PopupMenuButton<String>(
+                  onSelected: (value) => locService.setLanguage(value),
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(value: 'fr', child: Text('Français')),
+                    const PopupMenuItem(value: 'mo', child: Text('Mooré')),
+                    const PopupMenuItem(value: 'di', child: Text('Dioula')),
+                  ],
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(locService.locale.languageCode.toUpperCase()),
+                      const Icon(Icons.arrow_drop_down),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.notifications),
+            title: Text(_getLocalizedText('notifications', locale)),
+            trailing: Consumer<NotificationService>(
+              builder: (context, notifService, child) {
+                return Switch(
+                  value: notifService.notificationsEnabled,
+                  onChanged: (value) =>
+                      notifService.setNotificationsEnabled(value),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getLocalizedText(String key, String locale) {
+    return AppTranslations.translate(key, locale);
+  }
+
   Widget _buildLoadingScreen() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Logo ou icône d'application
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
@@ -167,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen>
             child: const Icon(
               Icons.water_drop,
               size: 64,
-              color: Color(0xFF2D5016),
+              color: Color(0xFF4CAF50),
             ),
           ),
           const SizedBox(height: 32),
@@ -175,12 +340,17 @@ class _HomeScreenState extends State<HomeScreen>
             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
           ),
           const SizedBox(height: 16),
-          Text(
-            'Chargement d\'AgriAlert BF...',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
+          Consumer<LocalizationService>(
+            builder: (context, locService, child) {
+              return Text(
+                AppTranslations.translate(
+                    'loading', locService.locale.languageCode),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+              );
+            },
           ),
         ],
       ),
@@ -227,14 +397,71 @@ class _HomeScreenState extends State<HomeScreen>
       expandedHeight: 120,
       floating: false,
       pinned: true,
-      backgroundColor: Theme.of(context).colorScheme.primary,
+      backgroundColor: const Color(0xFF4CAF50),
+      leading: Builder(
+        builder: (context) => IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () => Scaffold.of(context).openDrawer(),
+        ),
+      ),
+      actions: [
+        Consumer<NotificationService>(
+          builder: (context, notifications, child) {
+            final unread = notifications.unreadNotifications.length;
+            return Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.notifications),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const NotificationsScreen(),
+                      ),
+                    );
+                  },
+                ),
+                if (unread > 0)
+                  Positioned(
+                    right: 8,
+                    top: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        '$unread',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+      ],
       flexibleSpace: FlexibleSpaceBar(
-        title: Text(
-          'AgriAlert BF',
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+        title: Consumer<LocalizationService>(
+          builder: (context, locService, child) {
+            return Text(
+              AppTranslations.translate(
+                  'app_name', locService.locale.languageCode),
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+            );
+          },
         ),
         background: Container(
           decoration: BoxDecoration(
@@ -242,44 +469,12 @@ class _HomeScreenState extends State<HomeScreen>
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Theme.of(context).colorScheme.primary,
-                Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                const Color(0xFF4CAF50),
+                const Color(0xFF4CAF50).withOpacity(0.8),
               ],
             ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 40, right: 16),
-            child: Align(
-              alignment: Alignment.topRight,
-              child: _buildMooreToggle(),
-            ),
-          ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildMooreToggle() {
-    // TODO: Implémenter le toggle Français/Mooré
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.language, color: Colors.white, size: 16),
-          const SizedBox(width: 6),
-          Text(
-            'FR',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-        ],
       ),
     );
   }
@@ -306,12 +501,12 @@ class _HomeScreenState extends State<HomeScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  color: const Color(0xFF4CAF50).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.location_on,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: Color(0xFF4CAF50),
                   size: 28,
                 ),
               ),
@@ -334,9 +529,9 @@ class _HomeScreenState extends State<HomeScreen>
               ),
               IconButton(
                 onPressed: () => _showRegionSelector(),
-                icon: Icon(
+                icon: const Icon(
                   Icons.edit_location_alt,
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: Color(0xFF2196F3),
                 ),
               ),
             ],
@@ -381,11 +576,16 @@ class _HomeScreenState extends State<HomeScreen>
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Prévisions 7 jours',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: Colors.white,
-                    ),
+              child: Consumer<LocalizationService>(
+                builder: (context, locService, child) {
+                  return Text(
+                    AppTranslations.translate(
+                        'forecast', locService.locale.languageCode),
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          color: Colors.white,
+                        ),
+                  );
+                },
               ),
             ),
             const SizedBox(height: 12),
@@ -429,14 +629,23 @@ class _HomeScreenState extends State<HomeScreen>
         FloatingActionButton(
           heroTag: 'share',
           onPressed: _shareAlert,
-          child: const Icon(Icons.share),
+          backgroundColor: const Color(0xFFFFC107),
+          child: const Icon(Icons.share, color: Color(0xFF212121)),
         ),
         const SizedBox(height: 12),
         FloatingActionButton.extended(
           heroTag: 'refresh',
           onPressed: _loadWeatherData,
+          backgroundColor: const Color(0xFF4CAF50),
           icon: const Icon(Icons.refresh),
-          label: const Text('Actualiser'),
+          label: Consumer<LocalizationService>(
+            builder: (context, locService, child) {
+              return Text(
+                AppTranslations.translate(
+                    'refresh', locService.locale.languageCode),
+              );
+            },
+          ),
         ),
       ],
     );
@@ -485,7 +694,6 @@ ${prediction.description}
 📱 Téléchargez AgriAlert BF pour plus d'informations
 ''';
 
-    // TODO: Implémenter le partage via share_plus
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Message prêt à partager:\n$message'),

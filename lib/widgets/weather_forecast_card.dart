@@ -12,7 +12,6 @@ class WeatherForecastCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final isToday = _isToday(weather.date);
 
     return Container(
@@ -23,7 +22,7 @@ class WeatherForecastCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: isToday
             ? Border.all(
-                color: theme.colorScheme.secondary,
+                color: const Color(0xFF2196F3), // Sky blue
                 width: 2,
               )
             : null,
@@ -44,10 +43,11 @@ class WeatherForecastCard extends StatelessWidget {
               children: [
                 Text(
                   _formatDate(weather.date),
-                  style: theme.textTheme.bodySmall?.copyWith(
+                  style: TextStyle(
                     color: isToday
-                        ? theme.colorScheme.secondary
-                        : theme.colorScheme.onSurface.withOpacity(0.6),
+                        ? const Color(0xFF2196F3) // Sky blue
+                        : const Color(0xFF212121).withOpacity(0.6),
+                    fontSize: 12,
                     fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -58,13 +58,13 @@ class WeatherForecastCard extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.secondary.withOpacity(0.2),
+                      color: const Color(0xFF2196F3).withOpacity(0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       'Aujourd\'hui',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.secondary,
+                      style: TextStyle(
+                        color: const Color(0xFF2196F3),
                         fontWeight: FontWeight.bold,
                         fontSize: 10,
                       ),
@@ -77,9 +77,10 @@ class WeatherForecastCard extends StatelessWidget {
               children: [
                 Text(
                   '${weather.temperature.toStringAsFixed(0)}°C',
-                  style: theme.textTheme.titleMedium?.copyWith(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
+                    color: const Color(0xFF4CAF50), // Primary green
+                    fontSize: 18,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -87,7 +88,7 @@ class WeatherForecastCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.water_drop,
                       size: 14,
                       color: Colors.blue,
@@ -98,7 +99,10 @@ class WeatherForecastCard extends StatelessWidget {
                         weather.precipitation == 0.0
                             ? 'Aucune pluie'
                             : '${weather.precipitation.toStringAsFixed(1)} mm',
-                        style: theme.textTheme.bodySmall,
+                        style: TextStyle(
+                          color: const Color(0xFF212121).withOpacity(0.7),
+                          fontSize: 12,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

@@ -18,7 +18,6 @@ class _RegionSelectorDialogState extends State<RegionSelectorDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final filteredRegions = burkinaRegions
         .where((region) =>
             region.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
@@ -39,9 +38,9 @@ class _RegionSelectorDialogState extends State<RegionSelectorDialog> {
           // Barre de titre
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary,
-              borderRadius: const BorderRadius.only(
+            decoration: const BoxDecoration(
+              color: Color(0xFF4CAF50), // Primary green
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(24),
                 topRight: Radius.circular(24),
               ),
@@ -60,7 +59,7 @@ class _RegionSelectorDialogState extends State<RegionSelectorDialog> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.location_city,
                       color: Colors.white,
                       size: 28,
@@ -69,10 +68,11 @@ class _RegionSelectorDialogState extends State<RegionSelectorDialog> {
                     Expanded(
                       child: Text(
                         'Choisissez votre région',
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                     ),
                     IconButton(
@@ -99,12 +99,12 @@ class _RegionSelectorDialogState extends State<RegionSelectorDialog> {
               },
               decoration: InputDecoration(
                 hintText: 'Rechercher une région...',
-                prefixIcon: Icon(
+                prefixIcon: const Icon(
                   Icons.search,
-                  color: theme.colorScheme.primary,
+                  color: Color(0xFF4CAF50), // Primary green
                 ),
                 filled: true,
-                fillColor: theme.colorScheme.primary.withOpacity(0.05),
+                fillColor: const Color(0xFF4CAF50).withOpacity(0.05),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -112,13 +112,13 @@ class _RegionSelectorDialogState extends State<RegionSelectorDialog> {
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(
-                    color: theme.colorScheme.primary.withOpacity(0.2),
+                    color: const Color(0xFF4CAF50).withOpacity(0.2),
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: theme.colorScheme.primary,
+                  borderSide: const BorderSide(
+                    color: Color(0xFF4CAF50), // Primary green
                     width: 2,
                   ),
                 ),
@@ -143,15 +143,13 @@ class _RegionSelectorDialogState extends State<RegionSelectorDialog> {
   }
 
   Widget _buildRegionItem(BuildContext context, RegionData region) {
-    final theme = Theme.of(context);
-
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.2),
+          color: const Color(0xFF4CAF50).withOpacity(0.2), // Primary green
         ),
         boxShadow: [
           BoxShadow(
@@ -173,12 +171,13 @@ class _RegionSelectorDialogState extends State<RegionSelectorDialog> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.1),
+                    color: const Color(0xFF4CAF50)
+                        .withOpacity(0.1), // Primary green
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.location_on,
-                    color: theme.colorScheme.primary,
+                    color: Color(0xFF4CAF50), // Primary green
                     size: 24,
                   ),
                 ),
@@ -189,17 +188,19 @@ class _RegionSelectorDialogState extends State<RegionSelectorDialog> {
                     children: [
                       Text(
                         region.name,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFF212121), // Dark grey
+                                ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         region.nameMoore,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
-                          fontStyle: FontStyle.italic,
-                        ),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: const Color(0xFF212121).withOpacity(0.6),
+                              fontStyle: FontStyle.italic,
+                            ),
                       ),
                     ],
                   ),
@@ -207,7 +208,8 @@ class _RegionSelectorDialogState extends State<RegionSelectorDialog> {
                 Icon(
                   Icons.arrow_forward_ios,
                   size: 16,
-                  color: theme.colorScheme.primary.withOpacity(0.5),
+                  color:
+                      const Color(0xFF4CAF50).withOpacity(0.5), // Primary green
                 ),
               ],
             ),

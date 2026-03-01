@@ -8,8 +8,6 @@ class BurkinaMapWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -38,7 +36,7 @@ class BurkinaMapWidget extends StatelessWidget {
             tileBuilder: (context, widget, tile) {
               return ColorFiltered(
                 colorFilter: ColorFilter.mode(
-                  theme.colorScheme.primary.withOpacity(0.15),
+                  const Color(0xFF4CAF50).withOpacity(0.15), // Primary green
                   BlendMode.darken,
                 ),
                 child: widget,
@@ -61,11 +59,8 @@ class BurkinaMapWidget extends StatelessWidget {
   }
 
   Widget _buildRegionMarker(BuildContext context, RegionData region) {
-    final theme = Theme.of(context);
-
-    // Pour le MVP, couleur uniforme. Dans la version complète,
-    // la couleur dépendrait du risque de sécheresse de chaque région
-    final markerColor = theme.colorScheme.primary;
+    // Couleur du marqueur basée sur le thème principal
+    const markerColor = Color(0xFF4CAF50); // Primary green
 
     return GestureDetector(
       onTap: () {
@@ -97,8 +92,6 @@ class BurkinaMapWidget extends StatelessWidget {
   }
 
   void _showRegionInfo(BuildContext context, RegionData region) {
-    final theme = Theme.of(context);
-
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -107,17 +100,18 @@ class BurkinaMapWidget extends StatelessWidget {
         ),
         title: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.location_city,
-              color: theme.colorScheme.primary,
+              color: Color(0xFF4CAF50), // Primary green
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 region.name,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF212121), // Dark grey
+                    ),
               ),
             ),
           ],
@@ -128,29 +122,41 @@ class BurkinaMapWidget extends StatelessWidget {
           children: [
             Text(
               'Nom en Mooré: ${region.nameMoore}',
-              style: theme.textTheme.bodyMedium,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: const Color(0xFF212121), // Dark grey
+                  ),
             ),
             const SizedBox(height: 8),
             Text(
               'Coordonnées:',
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF212121), // Dark grey
+                  ),
             ),
             Text(
               'Lat: ${region.latitude.toStringAsFixed(4)}°',
-              style: theme.textTheme.bodySmall,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: const Color(0xFF212121), // Dark grey
+                  ),
             ),
             Text(
               'Long: ${region.longitude.toStringAsFixed(4)}°',
-              style: theme.textTheme.bodySmall,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: const Color(0xFF212121), // Dark grey
+                  ),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Fermer'),
+            child: Text(
+              'Fermer',
+              style: TextStyle(
+                color: const Color(0xFF4CAF50), // Primary green
+              ),
+            ),
           ),
         ],
       ),
